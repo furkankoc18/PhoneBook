@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html">
+<h:head>
+	<title>PhoneBook</title>
+	<h:outputStylesheet library="css" name="bootstrap.min.css"/>
+	<h:outputScript library="js" name="jquery-3.3.1.min.js"/>	
+	<h:outputScript library="js" name="bootstrap.min.js"/>	
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous"/>
+	
+</h:head>
+<h:body>
+	<f:view>	
+		<div class="container">
+			<div class="row">
+				<h:form prependId="false" >
+					<h2 style="text-align: center">PhoneBook</h2>
+					<h:messages styleClass="alert alert-danger h6" />
+				<br></br>
+					<h:panelGrid columns="4" styleClass="table">
+							<h:column>
+								<h:outputLabel value="İsim Giriniz:" styleClass="h6" />
+							</h:column>
+							<h:column>
+								<h:inputText id="name" value="#{personBean.person.name}" styleClass="form-control" required="true" requiredMessage="Lütfen isim giriniz"/>
+							</h:column>
+							<h:column>
+								<h:outputLabel value="Soyisim Giriniz:" styleClass="h6" />
+							</h:column>
+							<h:column>
+								<h:inputText id="surname" value="#{personBean.person.surname}" styleClass="form-control" required="true" requiredMessage="Lütfen soyisim giriniz"/>
+							</h:column>
+							<h:column>
+								<h:outputLabel value="E-Posta Giriniz:" styleClass="h6"/>
+							</h:column>
+							<h:column>
+								<h:inputText id="email" value="#{personBean.person.eMail}" styleClass="form-control" required="true" requiredMessage="Lütfen e-posta giriniz"/>
+							</h:column>
+							<h:column>
+								<h:outputLabel value="Adres Giriniz:" styleClass="h6"/>
+							</h:column>
+							<h:column>
+								<h:inputTextarea value="#{personBean.person.address}" styleClass="form-control" style="resize:none" rows="3" required="true" requiredMessage="Lütfen adres giriniz"/>
+							</h:column>
+							<h:column>
+								<h:outputText value="Telefon No:" />
+							</h:column>
+							<h:column>
+								<h:inputText value="#{personBean.number}" styleClass="form-control"/>
+							</h:column>
+							<h:column>
+								<h:commandLink action="#{personBean.numberAdd()}" styleClass="btn btn-success">
+									<i class="fas fa-plus"></i>
+								</h:commandLink>
+							</h:column>
+						</h:panelGrid>
+				<h:commandButton value="Kaydet" action="#{personBean.personAdd()}" styleClass="btn btn-primary form-control" style="width:250px;" />
+
+				</h:form>
+					<br></br>
+				<h:form>
+					<h:dataTable value="#{personBean.numberList}" var="number" styleClass="table" style="width:350px;">
+						<h:column>
+							<f:facet name="header">No</f:facet>
+							<h:outputText value="#{personBean.numberList.indexOf(number)+1}" />
+						</h:column>
+						<h:column>
+							<f:facet name="header">Telefon No</f:facet>
+							<h:outputText value="#{number}" />
+						</h:column>
+						<h:column>
+							<f:facet name="header">İşlem</f:facet>
+							<h:commandLink action="#{personBean.numberRemove(number)}" styleClass="btn btn-danger">
+								<i class="fa fa-minus"></i>
+							</h:commandLink>						
+						</h:column>
+					</h:dataTable>	
+					</h:form>			
+			</div>
+			<hr></hr>
+			<h:form prependId="false">
+			<div class="row">
+				<h:dataTable styleClass="table" value="#{personBean.personList()}" var="person">
+					<h:column>
+						<f:facet name="header">No</f:facet>
+						<h:outputText value="#{personBean.personList().indexOf(person)+1}"/>
+					</h:column>
+					<h:column>
+						<f:facet name="header">İsim</f:facet>
+						<h:outputText id="name" value="#{person.name}"/>
+					</h:column>
+					<h:column>
+						<f:facet name="header">Soyisim</f:facet>
+						<h:outputText value="#{person.surname}"/>
+					</h:column>
+					<h:column>
+						<f:facet name="header">E-Posta</f:facet>
+						<h:outputText value="#{person.eMail}"/>
+					</h:column>
+					<h:column>
+						<f:facet name="header">İşlemler</f:facet>
+					<h:commandLink type="button" data-toggle="modal" data-target="#myModal" styleClass="btn btn-primary" onclick="$('#myModal').modal('show')">
+					    <i class="fas fa-search"></i>
+						<f:ajax render=":modal-title :modal-body" listener="#{personBean.getContactsInformation(person.id)}"/>
+					</h:commandLink>
+					<h:commandLink action="#{personBean.personRemove(person)}" styleClass="btn btn-danger" onclick="return confirm('Silmek istediğinize emin misiniz?')">
+						<i class="fa fa-trash"></i>
+					</h:commandLink>
+					</h:column>
+				</h:dataTable>
+			</div>
+  			<div class="modal fade" id="myModal" role="dialog">
+    			<div class="modal-dialog">
+      				<div class="modal-content">
+        				<div class="modal-header">
+          					<h4 class="modal-title"><h:outputText id="modal-title" value="#{personBean.modalPerson.name.toUpperCase()} #{personBean.modalPerson.surname.toUpperCase()}" /></h4>
+        				</div>
+        				<div class="modal-body">
+          						<h:dataTable id="modal-body" value="#{personBean.modalNumbers}" var="number" styleClass="table">
+          							<h:column>
+          								<f:facet name="header">No</f:facet>
+          								<h:outputText value="#{personBean.modalNumbers.indexOf(number)+1}" />
+          							</h:column>
+          							<h:column>
+          								<f:facet name="header">Telefon No</f:facet>
+          								<h:outputText value="#{number}" />
+          							</h:column>
+          							<h:column>
+          								<f:facet name="header">İşlem</f:facet>
+										<h:commandLink styleClass="btn btn-danger" >
+											<i class="fa fa-minus"></i>
+											<f:ajax execute="@this" listener="#{personBean.deleteContactsNumber(personBean.modalPerson.id,number)}" render=":modal-body" event="click"/>
+										</h:commandLink>
+          							</h:column>
+          							
+          						</h:dataTable>
+        				</div>
+        				<div class="modal-footer">
+          					<button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+        				</div>
+      				</div>
+    			</div>
+  			</div>
+			</h:form>
+		</div>
+	</f:view>
+</h:body>
+</html>
